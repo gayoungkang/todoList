@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>TODO LIST</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css"/>
+</head>
+<style>
+    body {background-color: #30A4F8; color: #333333; font-size: 18px !important; margin: 0;}
+    .inner {width: 80%; max-width: 670px; margin: 0 auto; padding: 40px 0;}
+    section {width: 100%; height: 100%;}
+    h1 {color: #ffffff; text-align: center; font-size: 30px; font-weight: bold; margin: 0; margin-bottom: 40px;}
+    .wrap {width: 100%; margin: 0 auto; box-shadow: 0px 3px 11px 2px rgba(0, 0, 0, 0.05);}
+    form, ul {width: 100%; height: auto; position: relative; margin: 0; padding: 0;}
+    input {border: 0; width:100%; height: 50px; line-height: 50px; padding: 0 49px; font-size: 16px;}
+    input::placeholder {color: #333333; font-size: 16px;}
+    i {cursor: pointer;}
+    li {list-style: none; position: relative; width: 100%; height: 50px; line-height: 50px; padding: 0 49px; background-color: #ffffff; border-top: 1px solid #e8e8e8;}
+    .plus-icon {position: absolute; top: 50%; left: 20px; transform: translateY(-50%); color: #30A4F8;}
+    .check-icon {color:#20ce20; display: none;}
+    .check-icon.active {display: block;}
+    .default-icon.active {display: block;}
+    .default-icon {color: #b9b9b9; display: none;}
+    .close-icon {display: none; position: absolute; top: 50%; right: 20px; transform: translateY(-50%);}
+    .left-icon {position: absolute; top: 50%; left: 20px; transform: translateY(-50%);}
+    .operation {width: 100%; height: 40px; background-color: #ffffff; position: relative; padding: 0 49px; border-top: 1px solid #e8e8e8; font-size: 15px; color: #969696;}
+    .col-1 {position: absolute; top: 50%; left: 20px; transform: translateY(-50%);}
+    .col-2 {position: absolute; top: 50%; right: 20px; transform: translateY(-50%);}
+    .clear-btn {color: #FFA54A; border: 1px solid #FFA54A; border-radius: 3px; background-color: #ffffff; cursor: pointer;}
+</style>
+<body>
+    <section>
+        <div class="inner">
+            <h1>Todo List</h1>
+            <div class="wrap">
+                <form action="javascript:void(0);">
+                    <i class="plus-icon fas fa-plus-circle"></i>
+                    <input type="text" placeholder="Add New List">
+                </form>
+                <ul id="add-todo-wrap">
+<!--                    <li><i class="left-icon default-icon active far fa-circle"></i><i class="left-icon check-icon fas fa-check-circle"></i><i class="close-icon fas fa-times"></i><span></span></li>-->
+                </ul>
+                <div class="operation">
+                    <div class="col-1">
+                        <span>All <span class="all">0</span> /</span>
+                        <span class="count">0</span>
+                        <span>check list</span>
+                    </div>
+                    <div class="col-2">
+                        <button class="clear-btn">All clear list</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+<script>
+    const clearBtn = document.querySelector('.clear-btn');
+    const input = document.querySelector('input');
+    const addTodoWrap = document.getElementById('add-todo-wrap');
+    const allListsCount = document.querySelector('.all');
+    const checkCount = document.querySelector('.count');
+
+    // 1. input keydouwn event 실행
+    input.addEventListener('keydown', function () {
+        // 2. keydouwn event 중 enterkey 로 이벤트 발생
+        if(window.event.keyCode == 13) {
+        // 3. enterkey 이벤트 발생시 태그 생성 및 변수에 담음
+            const addList = document.createElement('li');
+            const text =  document.createElement('span');
+            const defaultIcon = document.createElement('i');
+            const checkIcon = document.createElement('i');
+            const closeIcon = document.createElement('i');
+        // 4. css로 꾸며준 클래스 각 변수에 추가
+            defaultIcon.classList.add('fa-circle','left-icon', 'far', 'fa-circle', 'default-icon', 'active');
+            checkIcon.classList.add('left-icon', 'check-icon', 'fas', 'fa-check-circle');
+            closeIcon.classList.add('close-icon','fas', 'fa-times');
+        // 5. input에 입련된 값 넣어주기
+            text.textContent = input.value;
+        // 6. ul(부모) 기준으로 icon 및 text 넣기
+            addTodoWrap.appendChild(addList);
+            addList.appendChild(defaultIcon);
+            addList.appendChild(checkIcon);
+            addList.appendChild(closeIcon);
+            addList.appendChild(text);
+        // 7. input 값 초기화
+            input.value = null;
+        // 8. 생성된 list 중 icon 클릭 이벤트 발생 (todolist 완료했을때 체크하기 위해)
+            defaultIcon.addEventListener('click', function () {
+                defaultIcon.classList.contains('active');
+                defaultIcon.classList.remove('active');
+                checkIcon.classList.add('active');
+                if (checkIcon.classList.contains('active')) {
+                    text.style.cssText = "color: #D4D4D4; text-decoration:line-through;";
+                    closeIcon.style.cssText = "display: block;"
+        // 11. 아이콘 클릭 이벤트 발생시 함수실행
+                    checkIconFun();
+                }
+            });
+            checkIcon.addEventListener('click', function () {
+                checkIcon.classList.contains('active');
+                checkIcon.classList.remove('active');
+                defaultIcon.classList.add('active');
+                if (defaultIcon.classList.contains('active')) {
+                    text.style.cssText = "color: inherit; text-decoration:none;";
+                    closeIcon.style.cssText = "display: none;"
+        // 11. 아이콘 클릭 이벤트 발생시 함수실행
+                    checkIconFun();
+                }
+            });
+        // 9. 완료된 todolist 지우기
+            closeIcon.addEventListener('click', function () {
+                closeIcon.parentNode.remove();
+        // 11. 리스트 삭제시  함수실행
+                checkIconFun();
+                allListsFun();
+            });
+        // 13. 전체리스트 지우기
+            clearBtn.addEventListener('click', function () {
+                while ( addTodoWrap.hasChildNodes() ) {
+                    addTodoWrap.removeChild(addTodoWrap.firstChild );
+                }
+                checkIconFun();
+                allListsFun();
+            });
+        }
+        allListsFun();
+    });
+    // 10. 완료된 todolist 체크하고 해제할때 변환되는 함수 만들기
+    function checkIconFun() {
+        const checkIconAll = document.querySelectorAll('li i.check-icon.active');
+        for (let i=0; i<checkIconAll.length; i++) {
+            if (!checkIconAll[i].classList.contains('active')) {
+                checkIconAll.remove();
+            }
+        }
+        checkCount.textContent = checkIconAll.length;
+    }
+    // 12. 전체 todolist 보여주기
+    function allListsFun() {
+        const allLists =  document.querySelectorAll('li');
+        allListsCount.textContent = allLists.length;
+    }
+</script>
+</html>
